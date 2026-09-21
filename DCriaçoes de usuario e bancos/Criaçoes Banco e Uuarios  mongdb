@@ -1,0 +1,732 @@
+# DOCUMENTAÇÃO COMPLETA — MongoDB Replica Set `rsProd`
+
+============================================================
+CONFIGURAÇÃO DO BANCO DE DADOS
+==============================
+
+Banco principal:
+appdb
+
+Coleção criada:
+usuarios
+
+Comando:
+
+```javascript id="a1b2c3"
+use appdb
+
+db.createCollection("usuarios")
+```
+
+Inserção de múltiplos documentos:
+
+```javascript id="d4e5f6"
+db.usuarios.insertMany([
+  {
+    nome: "João Silva",
+    idade: 28,
+    email: "joao@email.com",
+    cargo: "Desenvolvedor",
+    ativo: true
+  },
+  {
+    nome: "Maria Souza",
+    idade: 32,
+    email: "maria@email.com",
+    cargo: "DBA",
+    ativo: true
+  },
+  {
+    nome: "Carlos Lima",
+    idade: 25,
+    email: "carlos@email.com",
+    cargo: "Analista",
+    ativo: false
+  }
+])
+```
+
+============================================================
+USUÁRIO OPERACIONAL PRINCIPAL
+=============================
+
+Usuário:
+appuser
+
+Role:
+readWrite
+
+Banco autenticador:
+appdb
+
+Criação:
+
+```javascript id="g7h8i9"
+use appdb
+
+db.createUser({
+  user: "appuser",
+  pwd: "mongoWek2025RS!",
+  roles: [
+    {
+      role: "readWrite",
+      db: "appdb"
+    }
+  ]
+})
+```
+
+============================================================
+STRING DE CONEXÃO APPUSER
+=========================
+
+Compass:
+
+```bash id="j1k2l3"
+mongodb://appuser:mongoWek2025RS%21@192.168.0.141:27017,192.168.0.194:27017/?replicaSet=rsProd&authSource=appdb
+```
+
+Bash:
+
+```bash id="m4n5o6"
+mongosh 'mongodb://appuser:mongoWek2025RS%21@192.168.0.141:27017,192.168.0.194:27017/?replicaSet=rsProd&authSource=appdb'
+```
+
+============================================================
+USUÁRIO SOMENTE LEITURA
+=======================
+
+Usuário:
+almeida
+
+Senha:
+wek0721
+
+Role:
+read
+
+Banco autenticador:
+test
+
+Criação:
+
+```javascript id="p7q8r9"
+use test
+
+db.createUser({
+  user: "almeida",
+  pwd: "wek0721",
+  roles: [
+    {
+      role: "read",
+      db: "appdb"
+    }
+  ]
+})
+```
+
+============================================================
+STRING DE CONEXÃO ALMEIDA
+=========================
+
+Compass:
+
+```bash id="s1t2u3"
+mongodb://almeida:wek0721@192.168.0.141:27017,192.168.0.194:27017/appdb?replicaSet=rsProd&authSource=test
+```
+
+Bash:
+
+```bash id="v4w5x6"
+mongosh 'mongodb://almeida:wek0721@192.168.0.141:27017,192.168.0.194:27017/appdb?replicaSet=rsProd&authSource=test'
+```
+
+============================================================
+VALIDAÇÃO DE PERMISSÕES
+=======================
+
+Ver permissões:
+
+```javascript id="y7z8a9"
+db.runCommand({
+  connectionStatus: 1,
+  showPrivileges: true
+})
+```
+
+============================================================
+PERMISSÕES APPUSER
+==================
+
+✔️ Permitido:
+
+* find
+* insert
+* update
+* remove
+* createCollection
+* dropCollection
+* createIndex
+
+❌ Negado:
+
+* root
+* userAdmin
+* clusterAdmin
+* acesso fora do appdb
+
+============================================================
+PERMISSÕES ALMEIDA
+==================
+
+✔️ Permitido:
+
+* find
+* findOne
+* leitura do appdb
+
+❌ Negado:
+
+* insert
+* update
+* delete
+* createCollection
+* createUser
+* administração
+
+============================================================
+TESTE DE BLOQUEIO
+=================
+
+```javascript id="b2c3d4"
+use bancoteste
+db.createCollection("teste")
+```
+
+Erro esperado:
+
+```bash id="e5f6g7"
+MongoServerError[Unauthorized]
+```
+
+============================================================
+OBSERVAÇÕES IMPORTANTES
+=======================
+
+1. `use` troca apenas o banco
+2. Usuários pertencem ao banco onde foram criados
+3. `authSource` deve corresponder ao banco do usuário
+4. Replica Set:
+   rsProd
+5. Hosts:
+
+* 192.168.0.141
+* 192.168.0.194
+
+============================================================
+STATUS FINAL
+============
+
+✔️ Replica Set funcional
+✔️ Banco appdb operacional
+✔️ appuser com readWrite validado
+✔️ almeida com read only validado
+✔️ Compass e Bash configurados
+✔️ Segurança de permissões confirmada
+# MONGODB - CRIAÇÃO DE USUÁRIOS E PERMISSÕES ADMINISTRATIVAS
+
+1. ACESSO ADMINISTRATIVO
+   ============================================================
+
+Conectar como administrador:
+
+```bash id="u1001"
+mongosh -u admin -p "SUA_SENHA" --authenticationDatabase admin
+```
+
+Replica Set:
+
+```bash id="u1002"
+mongosh 'mongodb://admin:SUA_SENHA@host1:27017,host2:27017/?replicaSet=rsProd&authSource=admin'
+```
+
+============================================================
+2. CRIAR USUÁRIO ROOT (ADMINISTRADOR GLOBAL)
+============================================
+
+```javascript id="u1003"
+use admin
+
+db.createUser({
+  user: "adminmaster",
+  pwd: "SenhaRootForte2026!",
+  roles: [
+    {
+      role: "root",
+      db: "admin"
+    }
+  ]
+})
+```
+
+============================================================
+3. CRIAR USUÁRIO ADMINISTRADOR DE USUÁRIOS
+==========================================
+
+```javascript id="u1004"
+use admin
+
+db.createUser({
+  user: "useradmin",
+  pwd: "SenhaUserAdmin2026!",
+  roles: [
+    {
+      role: "userAdminAnyDatabase",
+      db: "admin"
+    }
+  ]
+})
+```
+
+============================================================
+4. CRIAR USUÁRIO DBADMIN
+========================
+
+```javascript id="u1005"
+use admin
+
+db.createUser({
+  user: "dbadmin",
+  pwd: "SenhaDBAdmin2026!",
+  roles: [
+    {
+      role: "dbAdminAnyDatabase",
+      db: "admin"
+    }
+  ]
+})
+```
+
+============================================================
+5. CRIAR USUÁRIO READWRITE PARA BANCO ESPECÍFICO
+================================================
+
+```javascript id="u1006"
+use appdb
+
+db.createUser({
+  user: "appuser",
+  pwd: "SenhaApp2026!",
+  roles: [
+    {
+      role: "readWrite",
+      db: "appdb"
+    }
+  ]
+})
+```
+
+============================================================
+6. CRIAR USUÁRIO SOMENTE LEITURA
+================================
+
+```javascript id="u1007"
+use admin
+
+db.createUser({
+  user: "readonly",
+  pwd: "SenhaRead2026!",
+  roles: [
+    {
+      role: "read",
+      db: "appdb"
+    }
+  ]
+})
+```
+
+============================================================
+7. PRINCIPAIS ROLES ADMINISTRATIVAS
+===================================
+
+root
+
+* Controle total do cluster
+* Gerencia usuários
+* Gerencia bancos
+* Replica Set
+* Backup/Restore
+
+userAdminAnyDatabase
+
+* Criação e gerenciamento de usuários em qualquer banco
+
+dbAdminAnyDatabase
+
+* Administração estrutural dos bancos
+
+clusterAdmin
+
+* Administração do cluster/Replica Set
+
+readWrite
+
+* Leitura e escrita em banco específico
+
+read
+
+* Somente leitura
+
+============================================================
+8. VERIFICAR USUÁRIOS CRIADOS
+=============================
+
+Banco atual:
+
+```javascript id="u1008"
+db.getUsers()
+```
+
+Usuário específico:
+
+```javascript id="u1009"
+db.getUser("appuser")
+```
+
+Todos os bancos:
+
+```javascript id="u1010"
+use admin
+
+db.runCommand({
+  usersInfo: { forAllDBs: true }
+})
+```
+
+============================================================
+9. VALIDAR PERMISSÕES DO USUÁRIO CONECTADO
+==========================================
+
+```javascript id="u1011"
+db.runCommand({
+  connectionStatus: 1,
+  showPrivileges: true
+})
+```
+
+============================================================
+10. ALTERAR SENHA DE USUÁRIO
+============================
+
+```javascript id="u1012"
+use admin
+
+db.changeUserPassword("appuser", "NovaSenha2026!")
+```
+
+============================================================
+11. REMOVER USUÁRIO
+===================
+
+```javascript id="u1013"
+use admin
+
+db.dropUser("readonly")
+```
+
+============================================================
+12. STRINGS DE CONEXÃO
+======================
+
+ROOT:
+
+```bash id="u1014"
+mongodb://adminmaster:SenhaRootForte2026%21@host1:27017,host2:27017/?replicaSet=rsProd&authSource=admin
+```
+
+READWRITE:
+
+```bash id="u1015"
+mongodb://appuser:SenhaApp2026%21@host1:27017,host2:27017/appdb?replicaSet=rsProd&authSource=appdb
+```
+
+READONLY:
+
+```bash id="u1016"
+mongodb://readonly:SenhaRead2026%21@host1:27017,host2:27017/appdb?replicaSet=rsProd&authSource=admin
+```
+
+============================================================
+13. BOAS PRÁTICAS ADMINISTRATIVAS
+=================================
+
+✔️ Criar root separado de usuários operacionais
+✔️ Nunca usar root para aplicações
+✔️ Usar readWrite apenas quando necessário
+✔️ Usar read para auditoria/consulta
+✔️ Senhas fortes com caracteres especiais
+✔️ Revisar permissões periodicamente
+✔️ Testar `connectionStatus` após criação
+✔️ Manter `authSource` correto
+
+============================================================
+14. SEGURANÇA
+=============
+
+✔️ Menor privilégio possível
+✔️ Separação entre administração e operação
+✔️ Replica Set protegido
+✔️ Controle de autenticação SCRAM-SHA-256
+✔️ Evitar usuários globais desnecessários
+
+============================================================
+# MONGODB - CRIAÇÃO DE USUÁRIOS E PERMISSÕES ADMINISTRATIVAS
+
+1. ACESSO ADMINISTRATIVO
+   ============================================================
+
+Conectar como administrador:
+
+```bash id="u1001"
+mongosh -u admin -p "SUA_SENHA" --authenticationDatabase admin
+```
+
+Replica Set:
+
+```bash id="u1002"
+mongosh 'mongodb://admin:SUA_SENHA@host1:27017,host2:27017/?replicaSet=rsProd&authSource=admin'
+```
+
+============================================================
+2. CRIAR USUÁRIO ROOT (ADMINISTRADOR GLOBAL)
+============================================
+
+```javascript id="u1003"
+use admin
+
+db.createUser({
+  user: "adminmaster",
+  pwd: "SenhaRootForte2026!",
+  roles: [
+    {
+      role: "root",
+      db: "admin"
+    }
+  ]
+})
+```
+
+============================================================
+3. CRIAR USUÁRIO ADMINISTRADOR DE USUÁRIOS
+==========================================
+
+```javascript id="u1004"
+use admin
+
+db.createUser({
+  user: "useradmin",
+  pwd: "SenhaUserAdmin2026!",
+  roles: [
+    {
+      role: "userAdminAnyDatabase",
+      db: "admin"
+    }
+  ]
+})
+```
+
+============================================================
+4. CRIAR USUÁRIO DBADMIN
+========================
+
+```javascript id="u1005"
+use admin
+
+db.createUser({
+  user: "dbadmin",
+  pwd: "SenhaDBAdmin2026!",
+  roles: [
+    {
+      role: "dbAdminAnyDatabase",
+      db: "admin"
+    }
+  ]
+})
+```
+
+============================================================
+5. CRIAR USUÁRIO READWRITE PARA BANCO ESPECÍFICO
+================================================
+
+```javascript id="u1006"
+use appdb
+
+db.createUser({
+  user: "appuser",
+  pwd: "SenhaApp2026!",
+  roles: [
+    {
+      role: "readWrite",
+      db: "appdb"
+    }
+  ]
+})
+```
+
+============================================================
+6. CRIAR USUÁRIO SOMENTE LEITURA
+================================
+
+```javascript id="u1007"
+use admin
+
+db.createUser({
+  user: "readonly",
+  pwd: "SenhaRead2026!",
+  roles: [
+    {
+      role: "read",
+      db: "appdb"
+    }
+  ]
+})
+```
+
+============================================================
+7. PRINCIPAIS ROLES ADMINISTRATIVAS
+===================================
+
+root
+
+* Controle total do cluster
+* Gerencia usuários
+* Gerencia bancos
+* Replica Set
+* Backup/Restore
+
+userAdminAnyDatabase
+
+* Criação e gerenciamento de usuários em qualquer banco
+
+dbAdminAnyDatabase
+
+* Administração estrutural dos bancos
+
+clusterAdmin
+
+* Administração do cluster/Replica Set
+
+readWrite
+
+* Leitura e escrita em banco específico
+
+read
+
+* Somente leitura
+
+============================================================
+8. VERIFICAR USUÁRIOS CRIADOS
+=============================
+
+Banco atual:
+
+```javascript id="u1008"
+db.getUsers()
+```
+
+Usuário específico:
+
+```javascript id="u1009"
+db.getUser("appuser")
+```
+
+Todos os bancos:
+
+```javascript id="u1010"
+use admin
+
+db.runCommand({
+  usersInfo: { forAllDBs: true }
+})
+```
+
+============================================================
+9. VALIDAR PERMISSÕES DO USUÁRIO CONECTADO
+==========================================
+
+```javascript id="u1011"
+db.runCommand({
+  connectionStatus: 1,
+  showPrivileges: true
+})
+```
+
+============================================================
+10. ALTERAR SENHA DE USUÁRIO
+============================
+
+```javascript id="u1012"
+use admin
+
+db.changeUserPassword("appuser", "NovaSenha2026!")
+```
+
+============================================================
+11. REMOVER USUÁRIO
+===================
+
+```javascript id="u1013"
+use admin
+
+db.dropUser("readonly")
+```
+
+============================================================
+12. STRINGS DE CONEXÃO
+======================
+
+ROOT:
+
+```bash id="u1014"
+mongodb://adminmaster:SenhaRootForte2026%21@host1:27017,host2:27017/?replicaSet=rsProd&authSource=admin
+```
+
+READWRITE:
+
+```bash id="u1015"
+mongodb://appuser:SenhaApp2026%21@host1:27017,host2:27017/appdb?replicaSet=rsProd&authSource=appdb
+```
+
+READONLY:
+
+```bash id="u1016"
+mongodb://readonly:SenhaRead2026%21@host1:27017,host2:27017/appdb?replicaSet=rsProd&authSource=admin
+```
+
+============================================================
+13. BOAS PRÁTICAS ADMINISTRATIVAS
+=================================
+
+✔️ Criar root separado de usuários operacionais
+✔️ Nunca usar root para aplicações
+✔️ Usar readWrite apenas quando necessário
+✔️ Usar read para auditoria/consulta
+✔️ Senhas fortes com caracteres especiais
+✔️ Revisar permissões periodicamente
+✔️ Testar `connectionStatus` após criação
+✔️ Manter `authSource` correto
+
+============================================================
+14. SEGURANÇA
+=============
+
+✔️ Menor privilégio possível
+✔️ Separação entre administração e operação
+✔️ Replica Set protegido
+✔️ Controle de autenticação SCRAM-SHA-256
+✔️ Evitar usuários globais desnecessários
+
+============================================================
+FIM DA DOCUMENTAÇÃO
+===================
+
