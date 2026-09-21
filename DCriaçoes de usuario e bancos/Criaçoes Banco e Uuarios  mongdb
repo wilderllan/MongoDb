@@ -83,13 +83,13 @@ STRING DE CONEXÃO APPUSER
 Compass:
 
 ```bash id="j1k2l3"
-mongodb://appuser:mongoWek2025RS%21@192.168.0.141:27017,192.168.0.194:27017/?replicaSet=rsProd&authSource=appdb
+mongodb://appuser:mongoppp2025RS%21@192.168.0.141:27017,192.168.0.194:27017/?replicaSet=rsProd&authSource=appdb
 ```
 
 Bash:
 
 ```bash id="m4n5o6"
-mongosh 'mongodb://appuser:mongoWek2025RS%21@192.168.0.141:27017,192.168.0.194:27017/?replicaSet=rsProd&authSource=appdb'
+mongosh 'mongodb://appuser:mongoppp2025RS%21@192.168.0.141:27017,192.168.0.194:27017/?replicaSet=rsProd&authSource=appdb'
 ```
 
 ============================================================
@@ -132,13 +132,13 @@ STRING DE CONEXÃO ALMEIDA
 Compass:
 
 ```bash id="s1t2u3"
-mongodb://almeida:wek0721@192.168.0.141:27017,192.168.0.194:27017/appdb?replicaSet=rsProd&authSource=test
+mongodb://almeida:ppp0721@192.168.0.141:27017,192.168.0.194:27017/appdb?replicaSet=rsProd&authSource=test
 ```
 
 Bash:
 
 ```bash id="v4w5x6"
-mongosh 'mongodb://almeida:wek0721@192.168.0.141:27017,192.168.0.194:27017/appdb?replicaSet=rsProd&authSource=test'
+mongosh 'mongodb://almeida:ppp0721@192.168.0.141:27017,192.168.0.194:27017/appdb?replicaSet=rsProd&authSource=test'
 ```
 
 ============================================================
