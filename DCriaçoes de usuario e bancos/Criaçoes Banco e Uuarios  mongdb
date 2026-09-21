@@ -66,7 +66,7 @@ use appdb
 
 db.createUser({
   user: "appuser",
-  pwd: "mongoWek2025RS!",
+  pwd: "mongoppp2025RS!",
   roles: [
     {
       role: "readWrite",
@@ -115,7 +115,7 @@ use test
 
 db.createUser({
   user: "almeida",
-  pwd: "wek0721",
+  pwd: "ppp0721",
   roles: [
     {
       role: "read",
